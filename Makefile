@@ -7,7 +7,7 @@ BUILD_DIR = build
 TARGET = $(BUILD_DIR)/hdialog
 TEST_TARGET = $(BUILD_DIR)/dialog_options_test
 SOURCES = src/DialogApplication.cpp src/DialogOptions.cpp \
-	src/DialogWindow.cpp src/IconView.cpp src/main.cpp
+	src/DialogWindow.cpp src/IconView.cpp src/JsonOutput.cpp src/main.cpp
 OBJECTS = $(patsubst src/%.cpp,$(BUILD_DIR)/%.o,$(SOURCES))
 TEST_OBJECT = $(BUILD_DIR)/DialogOptionsTest.o
 DEPENDENCIES = $(OBJECTS:.o=.d) $(TEST_OBJECT:.o=.d)
@@ -19,7 +19,8 @@ all: $(TARGET)
 $(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LDLIBS) -o $@
 
-$(TEST_TARGET): $(TEST_OBJECT) $(BUILD_DIR)/DialogOptions.o
+$(TEST_TARGET): $(TEST_OBJECT) $(BUILD_DIR)/DialogOptions.o \
+	$(BUILD_DIR)/JsonOutput.o
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 $(BUILD_DIR)/%.o: src/%.cpp | $(BUILD_DIR)

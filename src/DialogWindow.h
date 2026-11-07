@@ -3,6 +3,9 @@
 
 #include <Window.h>
 
+#include <string>
+#include <vector>
+
 #include "DialogOptions.h"
 
 class BMessageRunner;
@@ -11,6 +14,11 @@ class BMenuField;
 class BStatusBar;
 class BTextControl;
 class BTextView;
+
+struct NamedFieldControl {
+	std::string name;
+	BTextControl* control;
+};
 
 class DialogWindow : public BWindow {
 public:
@@ -28,6 +36,7 @@ private:
 	BStatusBar* fProgressBar;
 	BTextControl* fInputControl;
 	BTextView* fMessageView;
+	std::vector<NamedFieldControl> fFieldControls;
 	bool fResultSent;
 };
 

@@ -50,6 +50,14 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 			fInputControl->TextView()->HideTyping(true);
 		detailGroup->GroupLayout()->AddView(fInputControl);
 	}
+	for (const NamedFieldOptions& field : options.fields) {
+		BTextControl* control = new BTextControl(field.name.c_str(),
+			field.label.c_str(), field.value.c_str(), nullptr);
+		if (field.password)
+			control->TextView()->HideTyping(true);
+		detailGroup->GroupLayout()->AddView(control);
+		fFieldControls.push_back({ field.name, control });
+	}
 	if (!options.checkboxLabel.empty()) {
 		fCheckbox = new BCheckBox("checkbox", options.checkboxLabel.c_str(),
 			nullptr);
@@ -195,6 +203,10 @@ DialogWindow::SendResult(int32 result)
 	message.AddInt32("result", result);
 	if (fInputControl != nullptr)
 		message.AddString("input", fInputControl->Text());
+	for (const NamedFieldControl& field : fFieldControls) {
+		message.AddString("field_name", field.name.c_str());
+		message.AddString("field_value", field.control->Text());
+	}
 	if (fCheckbox != nullptr)
 		message.AddBool("checked", fCheckbox->Value() == B_CONTROL_ON);
 	if (fSelectionField != nullptr

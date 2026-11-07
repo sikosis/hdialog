@@ -5,6 +5,13 @@
 #include <string>
 #include <vector>
 
+struct NamedFieldOptions {
+	std::string name;
+	std::string label;
+	std::string value;
+	bool password = false;
+};
+
 struct DialogOptions {
 	std::string title = "hdialog";
 	std::string message;
@@ -16,6 +23,7 @@ struct DialogOptions {
 	std::string checkboxLabel;
 	std::string selectedItem;
 	std::vector<std::string> selectionItems;
+	std::vector<NamedFieldOptions> fields;
 	int timeoutSeconds = 0;
 	int progress = -1;
 	int width = 520;
@@ -23,6 +31,7 @@ struct DialogOptions {
 	bool showHelp = false;
 	bool passwordInput = false;
 	bool checkboxChecked = false;
+	bool jsonOutput = false;
 };
 
 bool ParseDialogOptions(int argumentCount, const char* const arguments[],

@@ -38,6 +38,20 @@ ReadValue(int& index, int argumentCount, const char* const arguments[],
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
+
+bool
+SplitAssignment(const std::string& value, std::string& name,
+	std::string& assignedValue)
+{
+	const size_t equals = value.find('=');
+	if (equals == std::string::npos || equals == 0)
+		return false;
+	name = value.substr(0, equals);
+	assignedValue = value.substr(equals + 1);
+	return !assignedValue.empty();
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
 } // namespace
 
 bool
@@ -56,6 +70,10 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 		}
 		if (argument == "--checked") {
 			options.checkboxChecked = true;
+			continue;
+		}
+		if (argument == "--json") {
+			options.jsonOutput = true;
 			continue;
 		}
 		if (argument.rfind("--", 0) != 0) {
@@ -94,6 +112,33 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 			options.selectionItems.push_back(value);
 		else if (name == "--selected")
 			options.selectedItem = value;
+		else if (name == "--field" || name == "--passwordfield") {
+			NamedFieldOptions field;
+			if (!SplitAssignment(value, field.name, field.label)) {
+				error = std::string(name) + " must use NAME=LABEL";
+				return false;
+			}
+			field.password = name == "--passwordfield";
+			options.fields.push_back(field);
+		} else if (name == "--fieldvalue") {
+			std::string fieldName;
+			std::string fieldValue;
+			if (!SplitAssignment(value, fieldName, fieldValue)) {
+				error = "--fieldvalue must use NAME=VALUE";
+				return false;
+			}
+			bool found = false;
+			for (NamedFieldOptions& field : options.fields) {
+				if (field.name == fieldName) {
+					field.value = fieldValue;
+					found = true;
+				}
+			}
+			if (!found) {
+				error = "--fieldvalue must follow its --field";
+				return false;
+			}
+		}
 		else if (name == "--progress") {
 			if (!ParseInteger(value, 0, options.progress)
 				|| options.progress > 100) {
@@ -144,6 +189,14 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 			return false;
 		}
 	}
+	for (size_t index = 0; index < options.fields.size(); index++) {
+		for (size_t other = index + 1; other < options.fields.size(); other++) {
+			if (options.fields[index].name == options.fields[other].name) {
+				error = "field names must be unique";
+				return false;
+			}
+		}
+	}
 	return true;
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
@@ -165,6 +218,10 @@ PrintUsage(std::ostream& stream, const char* programName)
 		<< "  --checked            Initially check the checkbox\n"
 		<< "  --select ITEM        Add a selection item (may be repeated)\n"
 		<< "  --selected ITEM      Initially selected item\n"
+		<< "  --field NAME=LABEL   Add a named text field (may be repeated)\n"
+		<< "  --passwordfield NAME=LABEL  Add a named password field\n"
+		<< "  --fieldvalue NAME=VALUE     Set a named field's initial value\n"
+		<< "  --json               Write submitted values as JSON\n"
 		<< "  --progress VALUE     Show progress from 0 to 100\n"
 		<< "  --timeout SECONDS    Close after a positive number of seconds\n"
 		<< "  --width PIXELS       Window width (minimum: 320)\n"

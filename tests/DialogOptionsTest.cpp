@@ -1,4 +1,5 @@
 #include "DialogOptions.h"
+#include "JsonOutput.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -115,6 +116,34 @@ TestFormControls()
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
+
+void
+TestNamedFieldsAndJson()
+{
+	const char* arguments[] = { "hdialog", "--field", "username=User name:",
+		"--passwordfield=password=Password:", "--fieldvalue",
+		"username=Arthur", "--json" };
+	DialogOptions options;
+	std::string error;
+	Expect(ParseDialogOptions(7, arguments, options, error),
+		"named fields parse");
+	Expect(options.fields.size() == 2, "named field count");
+	Expect(options.fields[0].name == "username"
+		&& options.fields[0].value == "Arthur", "named field value");
+	Expect(options.fields[1].password, "named password field");
+	Expect(options.jsonOutput, "JSON output enabled");
+
+	std::vector<std::pair<std::string, std::string>> fields = {
+		{ "user\"name", "Arthur\nDent" }, { "path", "C:\\Temp" }
+	};
+	const std::string json = FormatJsonOutput(fields, true, "Tea", true,
+		false, true, "Home");
+	Expect(json == "{\"fields\":{\"user\\\"name\":\"Arthur\\nDent\","
+		"\"path\":\"C:\\\\Temp\"},\"input\":\"Tea\",\"checked\":false,"
+		"\"selection\":\"Home\"}", "JSON escaping and structure");
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
 } // namespace
 
 int
@@ -124,6 +153,7 @@ main()
 	TestAllValues();
 	TestInvalidValues();
 	TestFormControls();
+	TestNamedFieldsAndJson();
 	std::cout << "DialogOptions tests passed\n";
 	return 0;
 }

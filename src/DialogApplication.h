@@ -3,6 +3,9 @@
 
 #include <Application.h>
 
+#include <utility>
+#include <vector>
+
 #include "DialogOptions.h"
 
 class DialogWindow;
@@ -19,6 +22,7 @@ public:
 	const std::string& Input() const;
 	bool CheckboxChecked() const;
 	const std::string& Selection() const;
+	const std::vector<std::pair<std::string, std::string>>& Fields() const;
 
 private:
 	void HandleScriptingMessage(BMessage* message);
@@ -28,6 +32,7 @@ private:
 	DialogWindow* fWindow;
 	std::string fInput;
 	std::string fSelection;
+	std::vector<std::pair<std::string, std::string>> fFields;
 	bool fCheckboxChecked;
 	int fResult;
 };

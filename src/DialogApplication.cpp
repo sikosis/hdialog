@@ -40,6 +40,8 @@ DialogApplication::DialogApplication(const DialogOptions& options)
 	fCheckboxChecked(options.checkboxChecked),
 	fResult(kResultSecondary)
 {
+	for (const NamedFieldOptions& field : options.fields)
+		fFields.push_back({ field.name, field.value });
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
@@ -75,6 +77,16 @@ DialogApplication::MessageReceived(BMessage* message)
 		if (message->FindString("selection", &selection) == B_OK)
 			fSelection = selection;
 		message->FindBool("checked", &fCheckboxChecked);
+		fFields.clear();
+		for (int32 index = 0;; index++) {
+			const char* name;
+			const char* value;
+			if (message->FindString("field_name", index, &name) != B_OK
+				|| message->FindString("field_value", index, &value) != B_OK) {
+				break;
+			}
+			fFields.push_back({ name, value });
+		}
 		PostMessage(B_QUIT_REQUESTED);
 		return;
 	}
@@ -132,6 +144,14 @@ const std::string&
 DialogApplication::Selection() const
 {
 	return fSelection;
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
+
+const std::vector<std::pair<std::string, std::string>>&
+DialogApplication::Fields() const
+{
+	return fFields;
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 

@@ -59,6 +59,32 @@ On confirmation, the text value remains the first stdout line. A checkbox adds
 `checked=true` or `checked=false`, and a selection menu adds
 `selection=Item`. `--select` may be repeated to add menu items.
 
+### Named fields and JSON
+
+Use `--field NAME=LABEL` for repeatable named fields and
+`--passwordfield NAME=LABEL` when the value should be hidden. An initial value
+can be assigned after its field with `--fieldvalue NAME=VALUE`:
+
+```sh
+result=$(build/hdialog --title "Account" \
+    --field "username=User name:" \
+    --fieldvalue "username=Arthur" \
+    --passwordfield "password=Password:" \
+    --checkbox "Remember account" \
+    --select "Home" --select "Work" \
+    --json)
+```
+
+Successful JSON output has a stable structure suitable for scripts:
+
+```json
+{"fields":{"username":"Arthur","password":"secret"},"checked":false,"selection":"Home"}
+```
+
+Without `--json`, named values are written as `name=value`, one per line.
+Names must be unique. JSON strings are escaped without requiring an external
+JSON library.
+
 ## Scripting with `hey`
 
 While a dialog is running, its title, message, progress, and current input can
@@ -87,8 +113,8 @@ make test
 
 ## Direction
 
-Planned milestones include JSON input and output, multiple named form fields,
-file pickers, and richer scripted automation.
+Planned milestones include JSON input, file pickers, validation rules, and
+richer scripted automation.
 
 ## Licence
 
