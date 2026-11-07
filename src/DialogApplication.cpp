@@ -14,16 +14,16 @@ namespace {
 property_info kProperties[] = {
 	{ "Title", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, "The dialog window title", 0,
-		{ B_STRING_TYPE } },
+		{ B_STRING_TYPE }, {}, {} },
 	{ "Message", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, "The dialog message", 0,
-		{ B_STRING_TYPE } },
+		{ B_STRING_TYPE }, {}, {} },
 	{ "Progress", { B_GET_PROPERTY, B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER }, "Progress from 0 to 100", 0,
-		{ B_FLOAT_TYPE, B_INT32_TYPE } },
+		{ B_FLOAT_TYPE, B_INT32_TYPE }, {}, {} },
 	{ "Input", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
-		"The current text-field value", 0, { B_STRING_TYPE } },
-	{ nullptr }
+		"The current text-field value", 0, { B_STRING_TYPE }, {}, {} },
+	{ nullptr, {}, {}, nullptr, 0, {}, {}, {} }
 };
 
 BPropertyInfo kPropertyInfo(kProperties);
@@ -45,8 +45,11 @@ DialogApplication::DialogApplication(const DialogOptions& options)
 status_t
 DialogApplication::GetSupportedSuites(BMessage* data)
 {
-	data->AddString("suites", "suite/vnd.hdialog");
-	kPropertyInfo.AddToMessage(data);
+	status_t status = data->AddString("suites", "suite/vnd.hdialog");
+	if (status == B_OK)
+		status = data->AddFlat("messages", &kPropertyInfo);
+	if (status != B_OK)
+		return status;
 	return BApplication::GetSupportedSuites(data);
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
