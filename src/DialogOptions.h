@@ -17,7 +17,7 @@ struct DialogOptions {
 	std::string message;
 	std::string primaryButton = "OK";
 	std::string secondaryButton;
-	std::string iconPath;
+	std::string iconPath = "info";
 	std::string inputLabel;
 	std::string inputValue;
 	std::string checkboxLabel;
@@ -28,6 +28,7 @@ struct DialogOptions {
 	int progress = -1;
 	int width = 520;
 	int height = 240;
+	int iconSize = 96;
 	bool showHelp = false;
 	bool passwordInput = false;
 	bool checkboxChecked = false;

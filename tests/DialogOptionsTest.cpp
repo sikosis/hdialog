@@ -28,6 +28,8 @@ TestDefaults()
 	Expect(options.title == "hdialog", "default title");
 	Expect(options.primaryButton == "OK", "default primary button");
 	Expect(options.timeoutSeconds == 0, "default timeout disabled");
+	Expect(options.iconPath == "info" && options.iconSize == 96,
+		"default built-in icon");
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
@@ -81,6 +83,12 @@ TestInvalidValues()
 	error.clear();
 	Expect(!ParseDialogOptions(3, largeProgress, options, error),
 		"large progress rejected");
+
+	const char* smallIcon[] = { "hdialog", "--iconsize", "16" };
+	options = DialogOptions();
+	error.clear();
+	Expect(!ParseDialogOptions(3, smallIcon, options, error),
+		"small icon rejected");
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 

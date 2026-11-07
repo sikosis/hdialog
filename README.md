@@ -43,8 +43,20 @@ name=$(build/hdialog --title "Welcome" --textfield "Name:" \
     --button1text "Continue" --button2text "Cancel")
 ```
 
+Dialogs show the built-in `info` image by default. The scalable built-in images
+are `info`, `warning`, `error`, `question`, and `success`:
+
+```sh
+build/hdialog --title "Complete" --message "Installation finished." \
+    --icon success --iconsize 96
+```
+
 Use `--icon /path/to/image` for an image supported by Haiku's Translation Kit,
-and `--progress 0` to create a progress dialog.
+or `--icon none` for no image. `--iconsize` accepts 32–256 pixels. File images
+preserve their aspect ratio. When the path is not a translatable image,
+`hdialog` asks `BNodeInfo` for its native Tracker/MIME icon, so applications,
+documents, and folders can be used directly. Use `--progress 0` to create a
+progress dialog.
 
 Native form controls can be combined in one dialog:
 

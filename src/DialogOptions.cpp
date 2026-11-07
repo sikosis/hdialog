@@ -102,6 +102,13 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 			options.secondaryButton = value;
 		else if (name == "--icon")
 			options.iconPath = value;
+		else if (name == "--iconsize") {
+			if (!ParseInteger(value, 32, options.iconSize)
+				|| options.iconSize > 256) {
+				error = "--iconsize must be between 32 and 256";
+				return false;
+			}
+		}
 		else if (name == "--textfield")
 			options.inputLabel = value;
 		else if (name == "--value")
@@ -210,7 +217,8 @@ PrintUsage(std::ostream& stream, const char* programName)
 		<< "  --message TEXT       Main dialog message\n"
 		<< "  --button1text TEXT   Primary button label (default: OK)\n"
 		<< "  --button2text TEXT   Secondary button label\n"
-		<< "  --icon PATH          Image displayed beside the message\n"
+		<< "  --icon ICON          Built-in name, image path, or none\n"
+		<< "  --iconsize PIXELS    Icon size from 32 to 256 (default: 96)\n"
 		<< "  --textfield LABEL    Show a labelled text input\n"
 		<< "  --value TEXT         Initial text-field value\n"
 		<< "  --password           Hide characters entered in the text field\n"

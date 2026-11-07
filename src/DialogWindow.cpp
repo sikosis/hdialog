@@ -1,8 +1,10 @@
 #include "DialogWindow.h"
 
 #include <Application.h>
+#include <Bitmap.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <Entry.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
 #include <LayoutBuilder.h>
@@ -10,6 +12,7 @@
 #include <MessageRunner.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <NodeInfo.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
 #include <StatusBar.h>
@@ -87,10 +90,31 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 
 	BGroupView* contentGroup = new BGroupView(B_HORIZONTAL,
 		B_USE_DEFAULT_SPACING);
-	if (!options.iconPath.empty()) {
-		BBitmap* bitmap = BTranslationUtils::GetBitmap(options.iconPath.c_str());
-		if (bitmap != nullptr)
-			contentGroup->GroupLayout()->AddView(new IconView(bitmap));
+	if (!options.iconPath.empty() && options.iconPath != "none") {
+		const BuiltInIconKind kind = BuiltInIconForName(options.iconPath.c_str());
+		if (kind != BuiltInIconKind::None) {
+			contentGroup->GroupLayout()->AddView(new IconView(kind,
+				options.iconSize));
+		} else {
+			BBitmap* bitmap = BTranslationUtils::GetBitmap(
+				options.iconPath.c_str());
+			if (bitmap == nullptr) {
+				entry_ref reference;
+				if (get_ref_for_path(options.iconPath.c_str(), &reference) == B_OK) {
+					bitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
+					if (bitmap->InitCheck() != B_OK
+						|| BNodeInfo::GetTrackerIcon(&reference, bitmap,
+							B_LARGE_ICON) != B_OK) {
+						delete bitmap;
+						bitmap = nullptr;
+					}
+				}
+			}
+			if (bitmap != nullptr) {
+				contentGroup->GroupLayout()->AddView(new IconView(bitmap,
+					options.iconSize));
+			}
+		}
 	}
 	contentGroup->GroupLayout()->AddView(detailGroup);
 

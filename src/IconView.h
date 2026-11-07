@@ -5,14 +5,30 @@
 
 class BBitmap;
 
+enum class BuiltInIconKind {
+	None,
+	Info,
+	Warning,
+	Error,
+	Question,
+	Success
+};
+
+BuiltInIconKind BuiltInIconForName(const char* name);
+
 class IconView : public BView {
 public:
-	explicit IconView(BBitmap* bitmap);
+	IconView(BBitmap* bitmap, float size);
+	IconView(BuiltInIconKind kind, float size);
 	~IconView() override;
 	void Draw(BRect updateRect) override;
 
 private:
+	void DrawBuiltInIcon();
+	void DrawCircleIcon(rgb_color colour);
+
 	BBitmap* fBitmap;
+	BuiltInIconKind fKind;
 };
 
 #endif
