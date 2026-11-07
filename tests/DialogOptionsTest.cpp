@@ -145,10 +145,40 @@ TestNamedFieldsAndJson()
 		{ "user\"name", "Arthur\nDent" }, { "path", "C:\\Temp" }
 	};
 	const std::string json = FormatJsonOutput(fields, true, "Tea", true,
-		false, true, "Home");
+		false, true, "Home", true, "/boot/home/file.txt");
 	Expect(json == "{\"fields\":{\"user\\\"name\":\"Arthur\\nDent\","
 		"\"path\":\"C:\\\\Temp\"},\"input\":\"Tea\",\"checked\":false,"
-		"\"selection\":\"Home\"}", "JSON escaping and structure");
+		"\"selection\":\"Home\",\"path\":\"/boot/home/file.txt\"}",
+		"JSON escaping and structure");
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
+
+void
+TestPickers()
+{
+	const char* fileArguments[] = { "hdialog", "--filepicker", "Document:",
+		"--path", "/boot/home" };
+	DialogOptions options;
+	std::string error;
+	Expect(ParseDialogOptions(5, fileArguments, options, error),
+		"file picker parses");
+	Expect(options.filePicker && options.pickerLabel == "Document:",
+		"file picker values");
+	Expect(options.initialPath == "/boot/home", "initial picker path");
+
+	const char* conflicting[] = { "hdialog", "--filepicker", "File:",
+		"--folderpicker", "Folder:" };
+	options = DialogOptions();
+	error.clear();
+	Expect(!ParseDialogOptions(5, conflicting, options, error),
+		"conflicting pickers rejected");
+
+	const char* orphanPath[] = { "hdialog", "--path", "/boot/home" };
+	options = DialogOptions();
+	error.clear();
+	Expect(!ParseDialogOptions(3, orphanPath, options, error),
+		"path without picker rejected");
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
@@ -162,6 +192,7 @@ main()
 	TestInvalidValues();
 	TestFormControls();
 	TestNamedFieldsAndJson();
+	TestPickers();
 	std::cout << "DialogOptions tests passed\n";
 	return 0;
 }

@@ -119,6 +119,14 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 			options.selectionItems.push_back(value);
 		else if (name == "--selected")
 			options.selectedItem = value;
+		else if (name == "--filepicker") {
+			options.filePicker = true;
+			options.pickerLabel = value;
+		} else if (name == "--folderpicker") {
+			options.folderPicker = true;
+			options.pickerLabel = value;
+		} else if (name == "--path")
+			options.initialPath = value;
 		else if (name == "--field" || name == "--passwordfield") {
 			NamedFieldOptions field;
 			if (!SplitAssignment(value, field.name, field.label)) {
@@ -185,6 +193,15 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 		error = "--checked requires --checkbox";
 		return false;
 	}
+	if (options.filePicker && options.folderPicker) {
+		error = "--filepicker and --folderpicker cannot be combined";
+		return false;
+	}
+	if (!options.initialPath.empty()
+		&& !options.filePicker && !options.folderPicker) {
+		error = "--path requires --filepicker or --folderpicker";
+		return false;
+	}
 	if (!options.selectedItem.empty()) {
 		bool selectionExists = false;
 		for (const std::string& item : options.selectionItems) {
@@ -226,6 +243,9 @@ PrintUsage(std::ostream& stream, const char* programName)
 		<< "  --checked            Initially check the checkbox\n"
 		<< "  --select ITEM        Add a selection item (may be repeated)\n"
 		<< "  --selected ITEM      Initially selected item\n"
+		<< "  --filepicker LABEL   Choose a file with BFilePanel\n"
+		<< "  --folderpicker LABEL Choose a folder with BFilePanel\n"
+		<< "  --path PATH          Initial picker path\n"
 		<< "  --field NAME=LABEL   Add a named text field (may be repeated)\n"
 		<< "  --passwordfield NAME=LABEL  Add a named password field\n"
 		<< "  --fieldvalue NAME=VALUE     Set a named field's initial value\n"

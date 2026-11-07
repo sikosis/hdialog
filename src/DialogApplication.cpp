@@ -37,6 +37,7 @@ DialogApplication::DialogApplication(const DialogOptions& options)
 	fWindow(nullptr),
 	fInput(options.inputValue),
 	fSelection(options.selectedItem),
+	fPath(options.initialPath),
 	fCheckboxChecked(options.checkboxChecked),
 	fResult(kResultSecondary)
 {
@@ -76,6 +77,9 @@ DialogApplication::MessageReceived(BMessage* message)
 		const char* selection;
 		if (message->FindString("selection", &selection) == B_OK)
 			fSelection = selection;
+		const char* path;
+		if (message->FindString("path", &path) == B_OK)
+			fPath = path;
 		message->FindBool("checked", &fCheckboxChecked);
 		fFields.clear();
 		for (int32 index = 0;; index++) {
@@ -144,6 +148,14 @@ const std::string&
 DialogApplication::Selection() const
 {
 	return fSelection;
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
+
+const std::string&
+DialogApplication::Path() const
+{
+	return fPath;
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 

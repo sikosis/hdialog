@@ -5,6 +5,7 @@
 #include <Button.h>
 #include <CheckBox.h>
 #include <Entry.h>
+#include <FilePanel.h>
 #include <GroupLayout.h>
 #include <GroupView.h>
 #include <LayoutBuilder.h>
@@ -14,6 +15,7 @@
 #include <MenuItem.h>
 #include <NodeInfo.h>
 #include <PopUpMenu.h>
+#include <Path.h>
 #include <Screen.h>
 #include <StatusBar.h>
 #include <TextControl.h>
@@ -29,10 +31,12 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 		options.title.c_str(), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fTimeoutRunner(nullptr),
+	fFilePanel(nullptr),
 	fCheckbox(nullptr),
 	fSelectionField(nullptr),
 	fProgressBar(nullptr),
 	fInputControl(nullptr),
+	fPathControl(nullptr),
 	fMessageView(nullptr),
 	fResultSent(false)
 {
@@ -60,6 +64,25 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 			control->TextView()->HideTyping(true);
 		detailGroup->GroupLayout()->AddView(control);
 		fFieldControls.push_back({ field.name, control });
+	}
+	if (options.filePicker || options.folderPicker) {
+		fPathControl = new BTextControl("path", options.pickerLabel.c_str(),
+			options.initialPath.c_str(), nullptr);
+		BButton* chooseButton = new BButton("choose", "Choose…",
+			new BMessage(kMessageChoosePath));
+		BGroupView* pickerGroup = new BGroupView(B_HORIZONTAL,
+			B_USE_DEFAULT_SPACING);
+		pickerGroup->GroupLayout()->AddView(fPathControl);
+		pickerGroup->GroupLayout()->AddView(chooseButton);
+		detailGroup->GroupLayout()->AddView(pickerGroup);
+
+		BMessenger target(this);
+		const uint32 nodeFlavours = options.folderPicker
+			? B_DIRECTORY_NODE : B_FILE_NODE;
+		fFilePanel = new BFilePanel(B_OPEN_PANEL, &target, nullptr,
+			nodeFlavours, false, new BMessage(kMessagePathSelected));
+		if (!options.initialPath.empty())
+			fFilePanel->SetPanelDirectory(options.initialPath.c_str());
 	}
 	if (!options.checkboxLabel.empty()) {
 		fCheckbox = new BCheckBox("checkbox", options.checkboxLabel.c_str(),
@@ -151,6 +174,7 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 DialogWindow::~DialogWindow()
 {
 	delete fTimeoutRunner;
+	delete fFilePanel;
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
@@ -199,6 +223,21 @@ DialogWindow::MessageReceived(BMessage* message)
 			message->SendReply(&reply);
 			break;
 		}
+		case kMessageChoosePath:
+			if (fFilePanel != nullptr)
+				fFilePanel->Show();
+			break;
+		case kMessagePathSelected:
+		{
+			entry_ref reference;
+			if (fPathControl != nullptr
+				&& message->FindRef("refs", &reference) == B_OK) {
+				BPath path(&reference);
+				if (path.InitCheck() == B_OK)
+					fPathControl->SetText(path.Path());
+			}
+			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -238,6 +277,8 @@ DialogWindow::SendResult(int32 result)
 		message.AddString("selection",
 			fSelectionField->Menu()->FindMarked()->Label());
 	}
+	if (fPathControl != nullptr)
+		message.AddString("path", fPathControl->Text());
 	be_app_messenger.SendMessage(&message);
 }
 //---------------------------------------------------------------------------------------------------------------------------------//

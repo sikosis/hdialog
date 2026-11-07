@@ -110,6 +110,21 @@ Without `--json`, named values are written as `name=value`, one per line.
 Names must be unique. JSON strings are escaped without requiring an external
 JSON library.
 
+### File and folder pickers
+
+`hdialog` uses Haiku's native `BFilePanel` to choose a file or folder:
+
+```sh
+build/hdialog --title "Open document" \
+    --filepicker "Document:" --path /boot/home --json
+
+build/hdialog --title "Choose destination" \
+    --folderpicker "Folder:" --path /boot/home
+```
+
+The chosen value is returned as `path=/boot/home/...` in line output or as the
+JSON `path` property. File and folder picker modes cannot be combined.
+
 ## Scripting with `hey`
 
 While a dialog is running, its title, message, progress, and current input can
@@ -138,8 +153,8 @@ make test
 
 ## Direction
 
-Planned milestones include JSON input, file pickers, validation rules, and
-richer scripted automation.
+Planned milestones include JSON input, validation rules, multiple selection,
+save panels, and richer scripted automation.
 
 ## Licence
 

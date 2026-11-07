@@ -63,7 +63,8 @@ std::string
 FormatJsonOutput(
 	const std::vector<std::pair<std::string, std::string>>& fields,
 	bool includeInput, const std::string& input, bool includeCheckbox,
-	bool checked, bool includeSelection, const std::string& selection)
+	bool checked, bool includeSelection, const std::string& selection,
+	bool includePath, const std::string& path)
 {
 	std::ostringstream output;
 	output << "{\"fields\":{";
@@ -80,6 +81,8 @@ FormatJsonOutput(
 	}
 	if (includeSelection)
 		AddStringProperty(output, propertyComma, "selection", selection);
+	if (includePath)
+		AddStringProperty(output, propertyComma, "path", path);
 	output << '}';
 	return output.str();
 }

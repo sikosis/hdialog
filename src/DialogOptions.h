@@ -22,6 +22,8 @@ struct DialogOptions {
 	std::string inputValue;
 	std::string checkboxLabel;
 	std::string selectedItem;
+	std::string pickerLabel;
+	std::string initialPath;
 	std::vector<std::string> selectionItems;
 	std::vector<NamedFieldOptions> fields;
 	int timeoutSeconds = 0;
@@ -33,6 +35,8 @@ struct DialogOptions {
 	bool passwordInput = false;
 	bool checkboxChecked = false;
 	bool jsonOutput = false;
+	bool filePicker = false;
+	bool folderPicker = false;
 };
 
 bool ParseDialogOptions(int argumentCount, const char* const arguments[],

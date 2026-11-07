@@ -8,6 +8,7 @@
 std::string FormatJsonOutput(
 	const std::vector<std::pair<std::string, std::string>>& fields,
 	bool includeInput, const std::string& input, bool includeCheckbox,
-	bool checked, bool includeSelection, const std::string& selection);
+	bool checked, bool includeSelection, const std::string& selection,
+	bool includePath, const std::string& path);
 
 #endif

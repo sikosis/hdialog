@@ -9,6 +9,7 @@
 #include "DialogOptions.h"
 
 class BMessageRunner;
+class BFilePanel;
 class BCheckBox;
 class BMenuField;
 class BStatusBar;
@@ -31,10 +32,12 @@ private:
 	void SendResult(int32 result);
 
 	BMessageRunner* fTimeoutRunner;
+	BFilePanel* fFilePanel;
 	BCheckBox* fCheckbox;
 	BMenuField* fSelectionField;
 	BStatusBar* fProgressBar;
 	BTextControl* fInputControl;
+	BTextControl* fPathControl;
 	BTextView* fMessageView;
 	std::vector<NamedFieldControl> fFieldControls;
 	bool fResultSent;

@@ -22,6 +22,7 @@ public:
 	const std::string& Input() const;
 	bool CheckboxChecked() const;
 	const std::string& Selection() const;
+	const std::string& Path() const;
 	const std::vector<std::pair<std::string, std::string>>& Fields() const;
 
 private:
@@ -32,6 +33,7 @@ private:
 	DialogWindow* fWindow;
 	std::string fInput;
 	std::string fSelection;
+	std::string fPath;
 	std::vector<std::pair<std::string, std::string>> fFields;
 	bool fCheckboxChecked;
 	int fResult;

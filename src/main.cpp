@@ -26,7 +26,9 @@ main(int argumentCount, char** arguments)
 		std::cout << FormatJsonOutput(application.Fields(),
 			!options.inputLabel.empty(), application.Input(),
 			!options.checkboxLabel.empty(), application.CheckboxChecked(),
-			!options.selectionItems.empty(), application.Selection()) << '\n';
+			!options.selectionItems.empty(), application.Selection(),
+			options.filePicker || options.folderPicker,
+			application.Path()) << '\n';
 		return application.Result();
 	}
 	if (application.Result() == 0 && !options.inputLabel.empty())
@@ -41,6 +43,10 @@ main(int argumentCount, char** arguments)
 	}
 	if (application.Result() == 0 && !options.selectionItems.empty())
 		std::cout << "selection=" << application.Selection() << '\n';
+	if (application.Result() == 0
+		&& (options.filePicker || options.folderPicker)) {
+		std::cout << "path=" << application.Path() << '\n';
+	}
 	return application.Result();
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
