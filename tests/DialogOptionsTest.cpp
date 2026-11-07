@@ -28,8 +28,10 @@ TestDefaults()
 	Expect(options.title == "hdialog", "default title");
 	Expect(options.primaryButton == "OK", "default primary button");
 	Expect(options.timeoutSeconds == 0, "default timeout disabled");
-	Expect(options.iconPath == "info" && options.iconSize == 96,
+	Expect(options.iconPath == "info" && options.iconSize == 64,
 		"default built-in icon");
+	Expect(options.width == 480 && options.height == 200,
+		"compact default dimensions");
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 

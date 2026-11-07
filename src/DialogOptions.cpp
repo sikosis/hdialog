@@ -235,7 +235,7 @@ PrintUsage(std::ostream& stream, const char* programName)
 		<< "  --button1text TEXT   Primary button label (default: OK)\n"
 		<< "  --button2text TEXT   Secondary button label\n"
 		<< "  --icon ICON          Built-in name, image path, or none\n"
-		<< "  --iconsize PIXELS    Icon size from 32 to 256 (default: 96)\n"
+		<< "  --iconsize PIXELS    Icon size from 32 to 256 (default: 64)\n"
 		<< "  --textfield LABEL    Show a labelled text input\n"
 		<< "  --value TEXT         Initial text-field value\n"
 		<< "  --password           Hide characters entered in the text field\n"

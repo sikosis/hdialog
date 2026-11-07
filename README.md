@@ -61,11 +61,12 @@ are `info`, `warning`, `error`, `question`, and `success`:
 
 ```sh
 build/hdialog --title "Complete" --message "Installation finished." \
-    --icon success --iconsize 96
+    --icon success
 ```
 
 Use `--icon /path/to/image` for an image supported by Haiku's Translation Kit,
-or `--icon none` for no image. `--iconsize` accepts 32–256 pixels. File images
+or `--icon none` for no image. Icons default to 64 px; `--iconsize` accepts
+32–256 pixels. File images
 preserve their aspect ratio. When the path is not a translatable image,
 `hdialog` asks `BNodeInfo` for its native Tracker/MIME icon, so applications,
 documents, and folders can be used directly. Use `--progress 0` to create a

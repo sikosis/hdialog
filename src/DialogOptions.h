@@ -28,9 +28,9 @@ struct DialogOptions {
 	std::vector<NamedFieldOptions> fields;
 	int timeoutSeconds = 0;
 	int progress = -1;
-	int width = 520;
-	int height = 240;
-	int iconSize = 96;
+	int width = 480;
+	int height = 200;
+	int iconSize = 64;
 	bool showHelp = false;
 	bool passwordInput = false;
 	bool checkboxChecked = false;
