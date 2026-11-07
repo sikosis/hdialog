@@ -1,6 +1,8 @@
 #include "DialogOptions.h"
 
 #include <charconv>
+#include <cerrno>
+#include <cstdlib>
 #include <ostream>
 #include <string_view>
 
@@ -49,6 +51,29 @@ SplitAssignment(const std::string& value, std::string& name,
 	name = value.substr(0, equals);
 	assignedValue = value.substr(equals + 1);
 	return !assignedValue.empty();
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
+
+bool
+ParseNumber(const std::string& text, double& value)
+{
+	errno = 0;
+	char* end = nullptr;
+	value = std::strtod(text.c_str(), &end);
+	return errno == 0 && end != text.c_str() && *end == '\0';
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
+
+NamedFieldOptions*
+FindField(DialogOptions& options, const std::string& name)
+{
+	for (NamedFieldOptions& field : options.fields) {
+		if (field.name == name)
+			return &field;
+	}
+	return nullptr;
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
@@ -142,16 +167,43 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 				error = "--fieldvalue must use NAME=VALUE";
 				return false;
 			}
-			bool found = false;
-			for (NamedFieldOptions& field : options.fields) {
-				if (field.name == fieldName) {
-					field.value = fieldValue;
-					found = true;
-				}
-			}
-			if (!found) {
+			NamedFieldOptions* field = FindField(options, fieldName);
+			if (field == nullptr) {
 				error = "--fieldvalue must follow its --field";
 				return false;
+			}
+			field->value = fieldValue;
+		} else if (name == "--required" || name == "--number") {
+			NamedFieldOptions* field = FindField(options, value);
+			if (field == nullptr) {
+				error = std::string(name) + " must follow its --field";
+				return false;
+			}
+			if (name == "--required")
+				field->required = true;
+			else
+				field->numeric = true;
+		} else if (name == "--min" || name == "--max") {
+			std::string fieldName;
+			std::string numberText;
+			double number;
+			if (!SplitAssignment(value, fieldName, numberText)
+				|| !ParseNumber(numberText, number)) {
+				error = std::string(name) + " must use NAME=NUMBER";
+				return false;
+			}
+			NamedFieldOptions* field = FindField(options, fieldName);
+			if (field == nullptr) {
+				error = std::string(name) + " must follow its --field";
+				return false;
+			}
+			field->numeric = true;
+			if (name == "--min") {
+				field->hasMinimum = true;
+				field->minimum = number;
+			} else {
+				field->hasMaximum = true;
+				field->maximum = number;
 			}
 		}
 		else if (name == "--progress") {
@@ -214,6 +266,12 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 		}
 	}
 	for (size_t index = 0; index < options.fields.size(); index++) {
+		const NamedFieldOptions& field = options.fields[index];
+		if (field.hasMinimum && field.hasMaximum
+			&& field.minimum > field.maximum) {
+			error = "field minimum cannot exceed its maximum";
+			return false;
+		}
 		for (size_t other = index + 1; other < options.fields.size(); other++) {
 			if (options.fields[index].name == options.fields[other].name) {
 				error = "field names must be unique";
@@ -249,6 +307,10 @@ PrintUsage(std::ostream& stream, const char* programName)
 		<< "  --field NAME=LABEL   Add a named text field (may be repeated)\n"
 		<< "  --passwordfield NAME=LABEL  Add a named password field\n"
 		<< "  --fieldvalue NAME=VALUE     Set a named field's initial value\n"
+		<< "  --required NAME      Require a named field\n"
+		<< "  --number NAME        Require a numeric value\n"
+		<< "  --min NAME=NUMBER    Set a numeric minimum\n"
+		<< "  --max NAME=NUMBER    Set a numeric maximum\n"
 		<< "  --json               Write submitted values as JSON\n"
 		<< "  --progress VALUE     Show progress from 0 to 100\n"
 		<< "  --timeout SECONDS    Close after a positive number of seconds\n"

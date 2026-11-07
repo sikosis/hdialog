@@ -184,6 +184,39 @@ TestPickers()
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
+
+void
+TestValidationRules()
+{
+	const char* arguments[] = { "hdialog", "--field", "age=Age:",
+		"--required", "age", "--number", "age", "--min", "age=18",
+		"--max=age=120" };
+	DialogOptions options;
+	std::string error;
+	Expect(ParseDialogOptions(10, arguments, options, error),
+		"validation rules parse");
+	Expect(options.fields[0].required && options.fields[0].numeric,
+		"required numeric field");
+	Expect(options.fields[0].hasMinimum && options.fields[0].minimum == 18,
+		"numeric minimum");
+	Expect(options.fields[0].hasMaximum && options.fields[0].maximum == 120,
+		"numeric maximum");
+
+	const char* unknown[] = { "hdialog", "--required", "missing" };
+	options = DialogOptions();
+	error.clear();
+	Expect(!ParseDialogOptions(3, unknown, options, error),
+		"validation rule without field rejected");
+
+	const char* reversed[] = { "hdialog", "--field", "age=Age:",
+		"--min", "age=20", "--max", "age=10" };
+	options = DialogOptions();
+	error.clear();
+	Expect(!ParseDialogOptions(7, reversed, options, error),
+		"reversed numeric range rejected");
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
 } // namespace
 
 int
@@ -195,6 +228,7 @@ main()
 	TestFormControls();
 	TestNamedFieldsAndJson();
 	TestPickers();
+	TestValidationRules();
 	std::cout << "DialogOptions tests passed\n";
 	return 0;
 }

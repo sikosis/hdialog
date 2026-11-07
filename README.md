@@ -111,6 +111,20 @@ Without `--json`, named values are written as `name=value`, one per line.
 Names must be unique. JSON strings are escaped without requiring an external
 JSON library.
 
+Named fields support live validation. The primary button remains disabled and
+an inline explanation is shown until every rule passes:
+
+```sh
+build/hdialog --title "Registration" \
+    --field "name=Name:" --required name \
+    --field "age=Age:" --required age --number age \
+    --min "age=18" --max "age=120" --json
+```
+
+`--required NAME` rejects an empty value. `--number NAME` requires a complete
+numeric value. `--min NAME=NUMBER` and `--max NAME=NUMBER` imply numeric
+validation and may be used independently.
+
 ### File and folder pickers
 
 `hdialog` uses Haiku's native `BFilePanel` to choose a file or folder:
@@ -154,8 +168,8 @@ make test
 
 ## Direction
 
-Planned milestones include JSON input, validation rules, multiple selection,
-save panels, and richer scripted automation.
+Planned milestones include JSON input, multiple selection, save panels, and
+richer scripted automation.
 
 ## Licence
 

@@ -10,6 +10,12 @@ struct NamedFieldOptions {
 	std::string label;
 	std::string value;
 	bool password = false;
+	bool required = false;
+	bool numeric = false;
+	bool hasMinimum = false;
+	bool hasMaximum = false;
+	double minimum = 0;
+	double maximum = 0;
 };
 
 struct DialogOptions {

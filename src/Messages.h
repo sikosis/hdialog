@@ -13,6 +13,7 @@ constexpr uint32 kMessageSetProgress = 'hdsp';
 constexpr uint32 kMessageGetInput = 'hdgi';
 constexpr uint32 kMessageChoosePath = 'hdcp';
 constexpr uint32 kMessagePathSelected = 'hdps';
+constexpr uint32 kMessageValidate = 'hdvl';
 constexpr int32 kResultPrimary = 0;
 constexpr int32 kResultSecondary = 2;
 constexpr int32 kResultTimeout = 4;

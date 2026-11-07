@@ -10,15 +10,18 @@
 
 class BMessageRunner;
 class BFilePanel;
+class BButton;
 class BCheckBox;
 class BMenuField;
 class BStatusBar;
 class BTextControl;
 class BTextView;
+class BStringView;
 
 struct NamedFieldControl {
 	std::string name;
 	BTextControl* control;
+	NamedFieldOptions options;
 };
 
 class DialogWindow : public BWindow {
@@ -30,8 +33,10 @@ public:
 
 private:
 	void SendResult(int32 result);
+	void ValidateFields();
 
 	BMessageRunner* fTimeoutRunner;
+	BButton* fPrimaryButton;
 	BFilePanel* fFilePanel;
 	BCheckBox* fCheckbox;
 	BMenuField* fSelectionField;
@@ -39,6 +44,7 @@ private:
 	BTextControl* fInputControl;
 	BTextControl* fPathControl;
 	BTextView* fMessageView;
+	BStringView* fValidationMessage;
 	std::vector<NamedFieldControl> fFieldControls;
 	bool fResultSent;
 };

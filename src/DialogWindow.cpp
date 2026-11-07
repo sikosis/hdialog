@@ -18,9 +18,13 @@
 #include <Path.h>
 #include <Screen.h>
 #include <StatusBar.h>
+#include <StringView.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <TranslationUtils.h>
+
+#include <cerrno>
+#include <cstdlib>
 
 #include "IconView.h"
 #include "Messages.h"
@@ -31,6 +35,7 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 		options.title.c_str(), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fTimeoutRunner(nullptr),
+	fPrimaryButton(nullptr),
 	fFilePanel(nullptr),
 	fCheckbox(nullptr),
 	fSelectionField(nullptr),
@@ -38,6 +43,7 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 	fInputControl(nullptr),
 	fPathControl(nullptr),
 	fMessageView(nullptr),
+	fValidationMessage(nullptr),
 	fResultSent(false)
 {
 	fMessageView = new BTextView("message");
@@ -62,8 +68,19 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 			field.label.c_str(), field.value.c_str(), nullptr);
 		if (field.password)
 			control->TextView()->HideTyping(true);
+		control->TextView()->SetModificationMessage(
+			new BMessage(kMessageValidate));
 		detailGroup->GroupLayout()->AddView(control);
-		fFieldControls.push_back({ field.name, control });
+		fFieldControls.push_back({ field.name, control, field });
+	}
+	for (const NamedFieldOptions& field : options.fields) {
+		if (field.required || field.numeric || field.hasMinimum
+			|| field.hasMaximum) {
+			fValidationMessage = new BStringView("validation", "");
+			fValidationMessage->SetHighColor(190, 45, 45);
+			detailGroup->GroupLayout()->AddView(fValidationMessage);
+			break;
+		}
 	}
 	if (options.filePicker || options.folderPicker) {
 		fPathControl = new BTextControl("path", options.pickerLabel.c_str(),
@@ -141,9 +158,9 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 	}
 	contentGroup->GroupLayout()->AddView(detailGroup);
 
-	BButton* primaryButton = new BButton("primary",
+	fPrimaryButton = new BButton("primary",
 		options.primaryButton.c_str(), new BMessage(kMessagePrimary));
-	primaryButton->MakeDefault(true);
+	fPrimaryButton->MakeDefault(true);
 	BGroupView* buttonGroup = new BGroupView(B_HORIZONTAL);
 	BLayoutBuilder::Group<>(buttonGroup)
 		.AddGlue();
@@ -151,7 +168,7 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 		buttonGroup->GroupLayout()->AddView(new BButton("secondary",
 			options.secondaryButton.c_str(), new BMessage(kMessageSecondary)));
 	}
-	buttonGroup->GroupLayout()->AddView(primaryButton);
+	buttonGroup->GroupLayout()->AddView(fPrimaryButton);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.SetInsets(B_USE_WINDOW_INSETS)
@@ -167,6 +184,7 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 		fTimeoutRunner = new BMessageRunner(BMessenger(this),
 			new BMessage(kMessageTimeout), options.timeoutSeconds * 1000000LL, 1);
 	}
+	ValidateFields();
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
@@ -238,6 +256,9 @@ DialogWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case kMessageValidate:
+			ValidateFields();
+			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -280,5 +301,47 @@ DialogWindow::SendResult(int32 result)
 	if (fPathControl != nullptr)
 		message.AddString("path", fPathControl->Text());
 	be_app_messenger.SendMessage(&message);
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
+
+void
+DialogWindow::ValidateFields()
+{
+	if (fPrimaryButton == nullptr)
+		return;
+
+	std::string error;
+	for (const NamedFieldControl& field : fFieldControls) {
+		const std::string value = field.control->Text();
+		if (field.options.required && value.empty()) {
+			error = field.options.label + " is required.";
+			break;
+		}
+		if (value.empty())
+			continue;
+		if (field.options.numeric) {
+			errno = 0;
+			char* end = nullptr;
+			const double number = std::strtod(value.c_str(), &end);
+			if (errno != 0 || end == value.c_str() || *end != '\0') {
+				error = field.options.label + " must be a number.";
+				break;
+			}
+			if (field.options.hasMinimum && number < field.options.minimum) {
+				error = field.options.label + " is below the minimum.";
+				break;
+			}
+			if (field.options.hasMaximum && number > field.options.maximum) {
+				error = field.options.label + " exceeds the maximum.";
+				break;
+			}
+		}
+	}
+	fPrimaryButton->SetEnabled(error.empty());
+	if (fValidationMessage != nullptr) {
+		fValidationMessage->SetText(error.c_str());
+		fValidationMessage->Invalidate();
+	}
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
