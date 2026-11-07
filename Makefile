@@ -1,7 +1,7 @@
 CXX ?= c++
 CPPFLAGS ?= -Isrc
 CXXFLAGS ?= -std=c++17 -Wall -Wextra -Wpedantic -O2
-LDLIBS = -lbe -ltranslation
+LDLIBS = -lbe -ltranslation -ltracker
 ICON2ICON ?= icon2icon
 RC ?= rc
 XRES ?= xres
