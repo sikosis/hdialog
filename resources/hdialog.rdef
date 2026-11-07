@@ -1,0 +1,13 @@
+resource app_signature "application/x-vnd.hdialog";
+
+resource app_version {
+	major = 0,
+	middle = 1,
+	minor = 0,
+	variety = B_APPV_DEVELOPMENT,
+	internal = 0,
+	short_info = "hdialog",
+	long_info = "Haiku-native scripted dialogs"
+};
+
+resource app_flags B_MULTIPLE_LAUNCH;

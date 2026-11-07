@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/hdialog.png" width="160" alt="hdialog icon">
+</p>
+
 # hdialog
 
 `hdialog` is a Haiku-native command-line utility for presenting custom dialogs
@@ -13,11 +17,20 @@ process exit codes for scripts.
 
 ## Building on Haiku
 
+The native application icon is generated in HVIF format during the build.
+Install the conversion tool once if it is not already available:
+
+```sh
+pkgman install hvif_tools
+```
+
 ```sh
 make
 ```
 
-The resulting executable is `build/hdialog`.
+The resulting `build/hdialog` contains its application signature, version, and
+HVIF icon resources for Tracker and Deskbar. The artwork source is
+`assets/hdialog.svg`; `assets/hdialog.png` is the README rendering.
 
 ## Usage
 
