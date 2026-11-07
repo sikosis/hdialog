@@ -6,9 +6,9 @@ from shell scripts and administration tools. It is inspired by
 API and follows Haiku interface conventions rather than reproducing a macOS
 interface.
 
-The first milestone supports a title and message, configurable primary and
-secondary buttons, an optional automatic timeout, window dimensions, and
-useful process exit codes for scripts.
+The current milestone supports a title and message, configurable primary and
+secondary buttons, image icons, text input, progress, an optional automatic
+timeout, window dimensions, and useful process exit codes for scripts.
 
 ## Building on Haiku
 
@@ -34,6 +34,34 @@ line arguments exit with `64`.
 Options may be written as `--name value` or `--name=value`. Run
 `build/hdialog --help` for the complete list.
 
+An input dialog writes its value to standard output when the primary button is
+pressed:
+
+```sh
+name=$(build/hdialog --title "Welcome" --textfield "Name:" \
+    --button1text "Continue" --button2text "Cancel")
+```
+
+Use `--icon /path/to/image` for an image supported by Haiku's Translation Kit,
+and `--progress 0` to create a progress dialog.
+
+## Scripting with `hey`
+
+While a dialog is running, its title, message, progress, and current input can
+be addressed through Haiku's standard scripting interface:
+
+```sh
+hey hdialog get Title
+hey hdialog set Title to "Installing"
+hey hdialog set Message to "Downloading packages…"
+hey hdialog set Progress to 50
+hey hdialog get Input
+```
+
+`Title`, `Message`, and `Progress` are readable and writable. `Input` is
+read-only. A progress bar must be created at launch with `--progress`; values
+set through `hey` must remain between 0 and 100.
+
 ## Testing
 
 The command-line parser is independent of the Haiku API, so its tests can run
@@ -45,9 +73,8 @@ make test
 
 ## Direction
 
-Planned milestones include icons via `BNodeInfo`/`BIconUtils`, text fields and
-other native controls, progress dialogs updated through `BMessage`, JSON input
-and output, and richer scripted automation.
+Planned milestones include checkboxes, selection lists, password input, JSON
+input and output, and richer scripted automation.
 
 ## Licence
 

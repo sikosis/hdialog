@@ -74,6 +74,19 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 			options.primaryButton = value;
 		else if (name == "--button2text")
 			options.secondaryButton = value;
+		else if (name == "--icon")
+			options.iconPath = value;
+		else if (name == "--textfield")
+			options.inputLabel = value;
+		else if (name == "--value")
+			options.inputValue = value;
+		else if (name == "--progress") {
+			if (!ParseInteger(value, 0, options.progress)
+				|| options.progress > 100) {
+				error = "--progress must be between 0 and 100";
+				return false;
+			}
+		}
 		else if (name == "--timeout") {
 			if (!ParseInteger(value, 1, options.timeoutSeconds)) {
 				error = "--timeout must be a positive whole number";
@@ -111,6 +124,10 @@ PrintUsage(std::ostream& stream, const char* programName)
 		<< "  --message TEXT       Main dialog message\n"
 		<< "  --button1text TEXT   Primary button label (default: OK)\n"
 		<< "  --button2text TEXT   Secondary button label\n"
+		<< "  --icon PATH          Image displayed beside the message\n"
+		<< "  --textfield LABEL    Show a labelled text input\n"
+		<< "  --value TEXT         Initial text-field value\n"
+		<< "  --progress VALUE     Show progress from 0 to 100\n"
 		<< "  --timeout SECONDS    Close after a positive number of seconds\n"
 		<< "  --width PIXELS       Window width (minimum: 320)\n"
 		<< "  --height PIXELS      Window height (minimum: 160)\n"

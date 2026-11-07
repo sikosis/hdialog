@@ -6,6 +6,9 @@
 #include "DialogOptions.h"
 
 class BMessageRunner;
+class BStatusBar;
+class BTextControl;
+class BTextView;
 
 class DialogWindow : public BWindow {
 public:
@@ -18,6 +21,9 @@ private:
 	void SendResult(int32 result);
 
 	BMessageRunner* fTimeoutRunner;
+	BStatusBar* fProgressBar;
+	BTextControl* fInputControl;
+	BTextView* fMessageView;
 	bool fResultSent;
 };
 

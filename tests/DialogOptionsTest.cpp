@@ -36,16 +36,20 @@ TestAllValues()
 {
 	const char* arguments[] = { "hdialog", "--title=Update", "--message",
 		"Ready", "--button1text", "Install", "--button2text=Later",
-		"--timeout", "30", "--width", "640", "--height=320" };
+		"--timeout", "30", "--width", "640", "--height=320",
+		"--textfield", "Name", "--value=Arthur", "--progress", "25" };
 	DialogOptions options;
 	std::string error;
-	Expect(ParseDialogOptions(12, arguments, options, error), "custom parse");
+	Expect(ParseDialogOptions(17, arguments, options, error), "custom parse");
 	Expect(options.title == "Update", "custom title");
 	Expect(options.message == "Ready", "custom message");
 	Expect(options.primaryButton == "Install", "custom primary button");
 	Expect(options.secondaryButton == "Later", "custom secondary button");
 	Expect(options.timeoutSeconds == 30, "custom timeout");
 	Expect(options.width == 640 && options.height == 320, "custom dimensions");
+	Expect(options.inputLabel == "Name" && options.inputValue == "Arthur",
+		"custom input");
+	Expect(options.progress == 25, "custom progress");
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 
@@ -70,6 +74,12 @@ TestInvalidValues()
 	error.clear();
 	Expect(!ParseDialogOptions(2, emptyButton, options, error),
 		"empty primary button rejected");
+
+	const char* largeProgress[] = { "hdialog", "--progress", "101" };
+	options = DialogOptions();
+	error.clear();
+	Expect(!ParseDialogOptions(3, largeProgress, options, error),
+		"large progress rejected");
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 

@@ -21,6 +21,8 @@ main(int argumentCount, char** arguments)
 
 	DialogApplication application(options);
 	application.Run();
+	if (application.Result() == 0 && !options.inputLabel.empty())
+		std::cout << application.Input() << '\n';
 	return application.Result();
 }
 //---------------------------------------------------------------------------------------------------------------------------------//

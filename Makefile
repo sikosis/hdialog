@@ -6,14 +6,14 @@ BUILD_DIR = build
 TARGET = $(BUILD_DIR)/hdialog
 TEST_TARGET = $(BUILD_DIR)/dialog_options_test
 SOURCES = src/DialogApplication.cpp src/DialogOptions.cpp \
-	src/DialogWindow.cpp src/main.cpp
+	src/DialogWindow.cpp src/IconView.cpp src/main.cpp
 
 .PHONY: all clean test
 
 all: $(TARGET)
 
 $(TARGET): $(SOURCES) | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -Isrc $(SOURCES) $(HAIKU_LIBS) -o $@
+	$(CXX) $(CXXFLAGS) -Isrc $(SOURCES) $(HAIKU_LIBS) -ltranslation -o $@
 
 $(TEST_TARGET): tests/DialogOptionsTest.cpp src/DialogOptions.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -Isrc tests/DialogOptionsTest.cpp src/DialogOptions.cpp -o $@
