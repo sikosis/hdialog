@@ -7,8 +7,9 @@ API and follows Haiku interface conventions rather than reproducing a macOS
 interface.
 
 The current milestone supports a title and message, configurable primary and
-secondary buttons, image icons, text input, progress, an optional automatic
-timeout, window dimensions, and useful process exit codes for scripts.
+secondary buttons, image icons, text and password input, checkboxes, selection
+menus, progress, an optional automatic timeout, window dimensions, and useful
+process exit codes for scripts.
 
 ## Building on Haiku
 
@@ -45,6 +46,19 @@ name=$(build/hdialog --title "Welcome" --textfield "Name:" \
 Use `--icon /path/to/image` for an image supported by Haiku's Translation Kit,
 and `--progress 0` to create a progress dialog.
 
+Native form controls can be combined in one dialog:
+
+```sh
+build/hdialog --title "Connection" \
+    --textfield "Password:" --password \
+    --checkbox "Remember this setting" --checked \
+    --select "Home" --select "Work" --selected "Home"
+```
+
+On confirmation, the text value remains the first stdout line. A checkbox adds
+`checked=true` or `checked=false`, and a selection menu adds
+`selection=Item`. `--select` may be repeated to add menu items.
+
 ## Scripting with `hey`
 
 While a dialog is running, its title, message, progress, and current input can
@@ -73,8 +87,8 @@ make test
 
 ## Direction
 
-Planned milestones include checkboxes, selection lists, password input, JSON
-input and output, and richer scripted automation.
+Planned milestones include JSON input and output, multiple named form fields,
+file pickers, and richer scripted automation.
 
 ## Licence
 

@@ -36,6 +36,8 @@ DialogApplication::DialogApplication(const DialogOptions& options)
 	fOptions(options),
 	fWindow(nullptr),
 	fInput(options.inputValue),
+	fSelection(options.selectedItem),
+	fCheckboxChecked(options.checkboxChecked),
 	fResult(kResultSecondary)
 {
 }
@@ -69,6 +71,10 @@ DialogApplication::MessageReceived(BMessage* message)
 		const char* input;
 		if (message->FindString("input", &input) == B_OK)
 			fInput = input;
+		const char* selection;
+		if (message->FindString("selection", &selection) == B_OK)
+			fSelection = selection;
+		message->FindBool("checked", &fCheckboxChecked);
 		PostMessage(B_QUIT_REQUESTED);
 		return;
 	}
@@ -110,6 +116,22 @@ const std::string&
 DialogApplication::Input() const
 {
 	return fInput;
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
+
+bool
+DialogApplication::CheckboxChecked() const
+{
+	return fCheckboxChecked;
+}
+//---------------------------------------------------------------------------------------------------------------------------------//
+
+
+const std::string&
+DialogApplication::Selection() const
+{
+	return fSelection;
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
 

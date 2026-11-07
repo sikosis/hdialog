@@ -23,6 +23,12 @@ main(int argumentCount, char** arguments)
 	application.Run();
 	if (application.Result() == 0 && !options.inputLabel.empty())
 		std::cout << application.Input() << '\n';
+	if (application.Result() == 0 && !options.checkboxLabel.empty()) {
+		std::cout << "checked="
+			<< (application.CheckboxChecked() ? "true" : "false") << '\n';
+	}
+	if (application.Result() == 0 && !options.selectionItems.empty())
+		std::cout << "selection=" << application.Selection() << '\n';
 	return application.Result();
 }
 //---------------------------------------------------------------------------------------------------------------------------------//

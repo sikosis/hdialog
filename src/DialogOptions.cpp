@@ -50,6 +50,14 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 			options.showHelp = true;
 			continue;
 		}
+		if (argument == "--password") {
+			options.passwordInput = true;
+			continue;
+		}
+		if (argument == "--checked") {
+			options.checkboxChecked = true;
+			continue;
+		}
 		if (argument.rfind("--", 0) != 0) {
 			error = "unexpected argument: " + std::string(argument);
 			return false;
@@ -80,6 +88,12 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 			options.inputLabel = value;
 		else if (name == "--value")
 			options.inputValue = value;
+		else if (name == "--checkbox")
+			options.checkboxLabel = value;
+		else if (name == "--select")
+			options.selectionItems.push_back(value);
+		else if (name == "--selected")
+			options.selectedItem = value;
 		else if (name == "--progress") {
 			if (!ParseInteger(value, 0, options.progress)
 				|| options.progress > 100) {
@@ -111,6 +125,25 @@ ParseDialogOptions(int argumentCount, const char* const arguments[],
 		error = "--button1text cannot be empty";
 		return false;
 	}
+	if (options.passwordInput && options.inputLabel.empty()) {
+		error = "--password requires --textfield";
+		return false;
+	}
+	if (options.checkboxChecked && options.checkboxLabel.empty()) {
+		error = "--checked requires --checkbox";
+		return false;
+	}
+	if (!options.selectedItem.empty()) {
+		bool selectionExists = false;
+		for (const std::string& item : options.selectionItems) {
+			if (item == options.selectedItem)
+				selectionExists = true;
+		}
+		if (!selectionExists) {
+			error = "--selected must match a --select item";
+			return false;
+		}
+	}
 	return true;
 }
 //---------------------------------------------------------------------------------------------------------------------------------//
@@ -127,6 +160,11 @@ PrintUsage(std::ostream& stream, const char* programName)
 		<< "  --icon PATH          Image displayed beside the message\n"
 		<< "  --textfield LABEL    Show a labelled text input\n"
 		<< "  --value TEXT         Initial text-field value\n"
+		<< "  --password           Hide characters entered in the text field\n"
+		<< "  --checkbox LABEL     Show a checkbox\n"
+		<< "  --checked            Initially check the checkbox\n"
+		<< "  --select ITEM        Add a selection item (may be repeated)\n"
+		<< "  --selected ITEM      Initially selected item\n"
 		<< "  --progress VALUE     Show progress from 0 to 100\n"
 		<< "  --timeout SECONDS    Close after a positive number of seconds\n"
 		<< "  --width PIXELS       Window width (minimum: 320)\n"

@@ -6,6 +6,8 @@
 #include "DialogOptions.h"
 
 class BMessageRunner;
+class BCheckBox;
+class BMenuField;
 class BStatusBar;
 class BTextControl;
 class BTextView;
@@ -21,6 +23,8 @@ private:
 	void SendResult(int32 result);
 
 	BMessageRunner* fTimeoutRunner;
+	BCheckBox* fCheckbox;
+	BMenuField* fSelectionField;
 	BStatusBar* fProgressBar;
 	BTextControl* fInputControl;
 	BTextView* fMessageView;

@@ -17,6 +17,8 @@ public:
 		BMessage* specifier, int32 form, const char* property) override;
 	int Result() const;
 	const std::string& Input() const;
+	bool CheckboxChecked() const;
+	const std::string& Selection() const;
 
 private:
 	void HandleScriptingMessage(BMessage* message);
@@ -25,6 +27,8 @@ private:
 	DialogOptions fOptions;
 	DialogWindow* fWindow;
 	std::string fInput;
+	std::string fSelection;
+	bool fCheckboxChecked;
 	int fResult;
 };
 
