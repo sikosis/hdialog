@@ -68,8 +68,7 @@ DialogWindow::DialogWindow(const DialogOptions& options)
 			field.label.c_str(), field.value.c_str(), nullptr);
 		if (field.password)
 			control->TextView()->HideTyping(true);
-		control->TextView()->SetModificationMessage(
-			new BMessage(kMessageValidate));
+		control->SetModificationMessage(new BMessage(kMessageValidate));
 		detailGroup->GroupLayout()->AddView(control);
 		fFieldControls.push_back({ field.name, control, field });
 	}
